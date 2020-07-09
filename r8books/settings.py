@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import os.path
+from os import path
 import json
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -21,8 +23,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # Read secret key from file or environment:
-if os.path.exists('keys.json'):
-    with open('keys.json', 'r') as keysfile:
+if os.path.exists('r8books/keys.json'):
+    with open('r8books/keys.json', 'r') as keysfile:
         data = keysfile.read()
     object = json.loads(data)
     SECRET_KEY = object['SECRET_KEY']
