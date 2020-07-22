@@ -1,0 +1,44 @@
+{% extends 'review/layout.html' %}
+{% load static %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col">
+            <h1>Register</h1>
+            <form action="{% url 'register' %}" method="post" class="my-3">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" {% if user.is_authenticated %}disabled{% endif %}>
+                </div>
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" {% if user.is_authenticated %}disabled{% endif %}>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" class="form-control" id="last_name" name="last_name" {% if user.is_authenticated %}disabled{% endif %}>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp" name="email" {% if user.is_authenticated %}disabled{% endif %}>
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                </div>
+                <div class="form-group">
+                    <label for="password1">Password</label>
+                    <input type="password" class="form-control" id="password1" name="password1" aria-describedby="passwordTip" {% if user.is_authenticated %}disabled{% endif %}>
+                    <small id="passwordTip" class="form-text text-muted">Try to use a password you don't use anywhere else.</small>
+                </div>
+                <div class="form-group">
+                    <label for="password2">Confirm Password</label>
+                    <input type="password" class="form-control" id="password2" name="password2" {% if user.is_authenticated %}disabled{% endif %}>
+                </div>
+                <button type="submit" class="btn btn-primary" {% if user.is_authenticated %}disabled{% endif %}>Submit</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
