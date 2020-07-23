@@ -24,7 +24,7 @@
                         {% with request.resolver_match.view_name as view_name %}
                             {% if user.is_authenticated %}
                                 <li class="nav-item mr-5">
-                                    <p class="welcome">Welcome, {{ user.username }} <img src="{% static 'review/images/icons/user.svg' %}" id="user-img"> !</p>
+                                    <p class="welcome">Welcome, {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} <img src="{% static 'review/images/icons/user.svg' %}" id="user-img"> !</p>
                                 </li>
                                 {% if view_name == 'index' %}
                                     <li class="nav-item active">

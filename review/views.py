@@ -53,22 +53,25 @@ def register(request):
             return render(request, 'review/register.html', {'message': 'Please provide a password confirmation.'})
         if password != password_confirm:
             return render(request, 'review/register.html', {'message': 'Please provide a password confirmation that matches the password.'})
+        if len(password) < 8:
+            return render(request, 'review/register.html', {'message': 'Please provide a password longer than 8 characters.'})
         # Check if the user already exists in the database
         try:
             if User.objects.get(username=username) or User.objects.get(email=email):
                 return render(request, 'review/register.html', {'message': 'That username or email have already been registered.'})
         except User.DoesNotExist:
             # Register new user
-            newuser = User.objects.create_user(username, password)
+            newuser = User.objects.create_user(username, email, password)
             if first_name:
                 newuser.first_name = first_name
             if last_name:
                 newuser.last_name = last_name
-            if email:
-                newuser.email = email
             newuser.save()
-            # Redirect user to login page
-            return render(request, 'review/login.html', {'message': 'User created succesfully!'})
+            # Log user in
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return HttpResponseRedirect(reverse("index"))
 
 def login_view(request):
     '''Display the login page and log user in.'''
@@ -79,10 +82,21 @@ def login_view(request):
     else:
         # If the user is currently logged in
         if request.user.is_authenticated:
-            return render(request, 'review/login.html', {'message': 'Please log out before trying to log in again.'})
+            return render(request, 'review/login.html', {'message': 'Please log out first.'})
+        username = request.POST['username']
+        if not username:
+            return render(request, 'review/login.html', {'message': 'Please provide a username.'})
+        password = request.POST['password']
+        if not password:
+            return render(request, 'review/login.html', {'message': 'Please provide a password.'})
+        user = authenticate(request, username=username, password=password)
+        if user is None:
+            return render(request, 'review/login.html', {'message': 'User does not exist.'})
+        else:
+            login(request, user)
+            return HttpResponseRedirect(reverse("index"))
 
 def logout_view(request):
     '''Log user out.'''
-    # When the user is redirected or they follow a link
-    if request.method == 'GET':
-        return HttpResponse('TODO /logout')
+    logout(request)
+    return HttpResponseRedirect(reverse("login"))
