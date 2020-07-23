@@ -16,17 +16,17 @@
                     <input type="text" class="form-control" id="username" name="username" {% if user.is_authenticated %}disabled{% endif %}>
                 </div>
                 <div class="form-group">
-                    <label for="first_name">First Name</label>
+                    <label for="first_name">First Name <b>(Optional)</b></label>
                     <input type="text" class="form-control" id="first_name" name="first_name" {% if user.is_authenticated %}disabled{% endif %}>
                 </div>
                 <div class="form-group">
-                    <label for="last_name">Last Name</label>
+                    <label for="last_name">Last Name <b>(Optional)</b></label>
                     <input type="text" class="form-control" id="last_name" name="last_name" {% if user.is_authenticated %}disabled{% endif %}>
                 </div>
                 <div class="form-group">
-                    <label for="email">Email address</label>
+                    <label for="email">Email Address <b>(Optional)</b></label>
                     <input type="email" class="form-control" id="email" aria-describedby="emailHelp" name="email" {% if user.is_authenticated %}disabled{% endif %}>
-                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                    <small id="emailHelp" class="form-text text-muted">We will never share your email with anyone else.</small>
                 </div>
                 <div class="form-group">
                     <label for="password1">Password</label>
