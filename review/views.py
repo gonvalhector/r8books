@@ -137,17 +137,3 @@ def logout_view(request):
 
     logout(request)
     return HttpResponseRedirect(reverse("login"))
-
-def add_to_db(request):
-    # Open books file
-    f = open("books.csv")
-    # Read the csv file
-    reader = csv.reader(f)
-    # Skip the headers row
-    next(reader, None)
-    # Iterate over every row in the csv file
-    for isbn, title, author, year in reader:
-        #db.execute("INSERT INTO books (isbn, title, author, year) VALUES (:isbn, :title, :author, :year)", {"isbn": isbn, "title": title, "author": author, "year": year})
-        b = books(isbn=isbn, title=title, author=author, year=year)
-        b.save()
-    return HttpResponseRedirect(reverse("index"))
