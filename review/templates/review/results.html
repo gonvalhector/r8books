@@ -1,0 +1,77 @@
+{% extends 'review/layout.html' %}
+
+{% block title %}
+    Search Results
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>Search Results for "{{ searchquery }}"</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <a href="#title">by Title</a> <span class="badge badge-primary badge-pill">{{ resultsbytitle | length }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#author">by Author</a> <span class="badge badge-primary badge-pill">{{ resultsbyauthor | length }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#isbn">by ISBN Number</a> <span class="badge badge-primary badge-pill">{{ resultsbyisbn | length }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <br>
+        <br>
+        <div class="row">
+            <div class="col">
+                <h2 id="title">Matches by Title:</h2>
+                <ul class="list-group">
+                    {% for result in resultsbytitle %}
+                        <li class="list-group-item"><a href="#">{{ result.title }}</a> <span class="badge badge-primary badge-pill">By {{ result.author }}</span> <span class="badge badge-pill badge-primary">Published in {{ result.year }}</span> <span class="badge badge-pill badge-primary">ISBN #{{ result.isbn }}</span></li>
+                    {% empty %}
+                        <li class="list-group-item">No matches found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <br>
+        <br>
+        <br>
+        <div class="row">
+            <div class="col">
+                <h2 id="author">Matches by Author:</h2>
+                <ul class="list-group">
+                    {% for result in resultsbyauthor %}
+                        <li class="list-group-item"><a href="#">{{ result.title }}</a> <span class="badge badge-primary badge-pill">By {{ result.author }}</span> <span class="badge badge-pill badge-primary">Published in {{ result.year }}</span> <span class="badge badge-pill badge-primary">ISBN #{{ result.isbn }}</span></li>
+                    {% empty %}
+                        <li class="list-group-item">No matches found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <br>
+        <br>
+        <br>
+        <div class="row">
+            <div class="col">
+                <h2 id="isbn">Matches by ISBN Number:</h2>
+                <ul class="list-group">
+                    {% for result in resultsbyisbn %}
+                        <li class="list-group-item"><a href="#">{{ result.title }}</a> <span class="badge badge-primary badge-pill">By {{ result.author }}</span> <span class="badge badge-pill badge-primary">Published in {{ result.year }}</span> <span class="badge badge-pill badge-primary">ISBN #{{ result.isbn }}</span></li>
+                    {% empty %}
+                        <li class="list-group-item">No matches found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <br>
+        <br>
+        <br>
+    </div>
+{% endblock %}

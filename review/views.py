@@ -7,20 +7,30 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .models import books, reviews
+from django.views.decorators.csrf import csrf_protect
 
 # Create your views here.
 def index(request):
+    """Display splash page"""
+
+    return render(request, "review/index.html")
+
+
+def search(request):
     """Search for a book by title, author or ISBN number."""
 
     # When the user is redirected or they follow a link
     if request.method == "GET":
+        # When the user is logged out
         if not request.user.is_authenticated:
             messages.add_message(request, messages.WARNING, "You must be logged in.")
             return HttpResponseRedirect(reverse("login"))
-        return render(request, "review/index.html")
+        return render(request, "review/search.html")
     # When the user submits a form (POST)
     else:
+        # When the user is logged out
         if not request.user.is_authenticated:
+            messages.add_message(request, messages.WARNING, "You must be logged in.")
             return HttpResponseRedirect(reverse("login"))
         # Request the submitted search query
         searchquery = request.POST["searchfield"]
@@ -28,18 +38,49 @@ def index(request):
         if not searchquery:
             # Return error message
             messages.add_message(request, messages.ERROR, "Please, input a title, author or the ISBN number of a book.")
-            return HttpResponseRedirect(reverse("index"))
-        # Query the database for books by title
-        #resultsbytitle = db.execute("SELECT * FROM books WHERE title LIKE :searchquery", {"searchquery": searchquery}).fetchall()
-        resultsbytitle = books.objects.filter(title__icontains=searchquery)
-        # Query the database for books by author
-        #resultsbyauthor = db.execute("SELECT * FROM books WHERE author LIKE :searchquery", {"searchquery": searchquery}).fetchall()
-        resultsbyauthor = books.objects.filter(author__icontains=searchquery)
-        # Query the database for books by ISBN
-        #resultsbyisbn = db.execute("SELECT * FROM books WHERE isbn LIKE :searchquery", {"searchquery": searchquery}).fetchall()
-        resultsbyisbn = books.objects.filter(isbn__icontains=searchquery)
-        messages.add_message(request, messages.INFO, f"resultsbytitle: {resultsbytitle}\nresultsbyauthor: {resultsbyauthor}\nresultsbyisbn: {resultsbyisbn}")
-        return HttpResponseRedirect(reverse("index"))
+            return HttpResponseRedirect(reverse("search"))
+        return HttpResponseRedirect(reverse("results", args=(searchquery,)))
+
+
+def empty_search(request):
+    """Redirect to search page when the user forgets the query."""
+
+    # When the user is logged out
+    if not request.user.is_authenticated:
+        messages.add_message(request, messages.WARNING, "You must be logged in.")
+        return HttpResponseRedirect(reverse("login"))
+    # Return error message and redirect user
+    messages.add_message(request, messages.ERROR, "Please, input a title, author or the ISBN number of a book.")
+    return HttpResponseRedirect(reverse("search"))
+
+
+@csrf_protect
+def search_results(request, searchquery):
+    """Display results of a search query."""
+
+    # If there is no search query
+    if not searchquery:
+        # Return error message
+        messages.add_message(request, messages.ERROR, "Please, input a title, author or the ISBN number of a book.")
+        return HttpResponseRedirect(reverse("search"))
+    # When the user is logged out
+    if not request.user.is_authenticated:
+        messages.add_message(request, messages.WARNING, "You must be logged in.")
+        return HttpResponseRedirect(reverse("login"))
+    # Query the database for books by title
+    resultsbytitle = books.objects.filter(title__icontains=searchquery)
+    # Query the database for books by author
+    resultsbyauthor = books.objects.filter(author__icontains=searchquery)
+    # Query the database for books by ISBN
+    resultsbyisbn = books.objects.filter(isbn__icontains=searchquery)
+    context = {
+        "searchquery": searchquery,
+        "resultsbytitle": resultsbytitle,
+        "resultsbyauthor": resultsbyauthor,
+        "resultsbyisbn": resultsbyisbn,
+    }
+    return render(request, "review/results.html", context)
+
 
 def register(request):
     """Display user registration form and register a new user."""
@@ -112,7 +153,7 @@ def register(request):
             if user is not None:
                 login(request, user)
                 messages.add_message(request, messages.SUCCESS, "Logged in succesfully!")
-                return HttpResponseRedirect(reverse("index"))
+                return HttpResponseRedirect(reverse("search"))
 
 
 def login_view(request):
@@ -142,7 +183,7 @@ def login_view(request):
         else:
             login(request, user)
             messages.add_message(request, messages.SUCCESS, "Logged in succesfully!")
-            return HttpResponseRedirect(reverse("index"))
+            return HttpResponseRedirect(reverse("search"))
 
 
 def logout_view(request):

@@ -12,7 +12,7 @@
     <body>
         <header>
             <nav class="navbar navbar-expand-lg">
-                <a href="" class="navbar-brand">
+                <a href="{% url 'index' %}" class="navbar-brand">
                     <img src="{% static 'review/images/icons/brand.svg' %}" id="brand-img">
                      R8Books
                 </a>
@@ -24,15 +24,15 @@
                         {% with request.resolver_match.view_name as view_name %}
                             {% if user.is_authenticated %}
                             <li class="nav-item mr-5">
-                                <p class="welcome">Welcome, {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} <img src="{% static 'review/images/icons/user.svg' %}" id="user-img"> !</p>
+                                <p class="welcome my-2">Welcome, {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} <img src="{% static 'review/images/icons/user.svg' %}" id="user-img"> !</p>
                             </li>
-                            {% if view_name == 'index' %}
+                            {% if view_name == 'search' %}
                             <li class="nav-item active">
                                 <a class="nav-link active" href="#"><img src="{% static 'review/images/icons/search.svg' %}" class="icon-active">Search Book <span class="sr-only">(current)</span></a>
                             </li>
                             {% else %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'index' %}"><img src="{% static 'review/images/icons/search.svg' %}" class="icon">Search Book</a>
+                                <a class="nav-link" href="{% url 'search' %}"><img src="{% static 'review/images/icons/search.svg' %}" class="icon">Search Book</a>
                             </li>
                             {% endif %}
                             <li class="nav-item">
@@ -64,6 +64,7 @@
             </nav>
         </header>
         <main>
+            <div id="top"></div>
             <div class="container">
                 {% if messages %}
                 <div class="messages">
@@ -76,8 +77,17 @@
                 {% endif %}
                 {% block main %}{% endblock %}
             </div>
+            <div id="bottom"></div>
         </main>
         <footer>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <span><a href="#bottom" class="nav-link"><img src="{% static 'review/images/icons/bottom.svg' %}" class="icon mx-2 float-right" alt="icon to go to the bottom" title="Bottom"></a></span>
+                        <span><a href="#top" class="nav-link"><img src="{% static 'review/images/icons/top.svg' %}" class="icon mx-2 float-right" alt="icon to go to the top" title="Top"></a></span>
+                    </div>
+                </div>
+            </div>
         </footer>
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>

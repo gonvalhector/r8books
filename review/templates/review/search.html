@@ -1,0 +1,22 @@
+{% extends 'review/layout.html' %}
+{% load static %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col">
+            <h1>Search Book</h1>
+            <form action="{% url 'search' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                <input type="text" class="form-control" id="searchfield" name="searchfield" aria-describedby="searchfieldTip" placeholder="Search by ISBN, title or author of the book">
+                <small id="searchfieldTip" class="form-text text-muted">You can type a partial query.</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
