@@ -36,8 +36,10 @@ if os.path.exists("r8books/keys.json"):
         data = keysfile.read()
     object = json.loads(data)
     SECRET_KEY = object["SECRET_KEY"]
+    API_KEY = object["API_KEY"]
 else:
     SECRET_KEY = os.environ["R8BOOKS_SECRET_KEY"]
+    API_KEY = os.environ["R8BOOKS_API_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

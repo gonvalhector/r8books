@@ -1,4 +1,4 @@
-import csv
+import requests
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
@@ -8,30 +8,28 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .models import books, reviews
 from django.views.decorators.csrf import csrf_protect
+from django.core.exceptions import FieldError, FieldDoesNotExist, ObjectDoesNotExist
+from django.conf import settings
 
 # Create your views here.
 def index(request):
-    """Display splash page"""
+    """Displays splash page"""
 
     return render(request, "review/index.html")
 
 
 def search(request):
-    """Search for a book by title, author or ISBN number."""
+    """Searches for a book by title, author or ISBN number."""
 
+    # When the user is logged out
+    if not request.user.is_authenticated:
+        messages.add_message(request, messages.WARNING, "You must be logged in.")
+        return HttpResponseRedirect(reverse("login"))
     # When the user is redirected or they follow a link
     if request.method == "GET":
-        # When the user is logged out
-        if not request.user.is_authenticated:
-            messages.add_message(request, messages.WARNING, "You must be logged in.")
-            return HttpResponseRedirect(reverse("login"))
         return render(request, "review/search.html")
     # When the user submits a form (POST)
     else:
-        # When the user is logged out
-        if not request.user.is_authenticated:
-            messages.add_message(request, messages.WARNING, "You must be logged in.")
-            return HttpResponseRedirect(reverse("login"))
         # Request the submitted search query
         searchquery = request.POST["searchfield"]
         # If there is no search query
@@ -43,7 +41,7 @@ def search(request):
 
 
 def empty_search(request):
-    """Redirect to search page when the user forgets the query."""
+    """Redirects to search page when the user forgets the query."""
 
     # When the user is logged out
     if not request.user.is_authenticated:
@@ -56,7 +54,7 @@ def empty_search(request):
 
 @csrf_protect
 def search_results(request, searchquery):
-    """Display results of a search query."""
+    """Displays results of a search query."""
 
     # If there is no search query
     if not searchquery:
@@ -81,9 +79,46 @@ def search_results(request, searchquery):
     }
     return render(request, "review/results.html", context)
 
+def book_page(request, book_id):
+    """Displays a page with title, author, ISBN, publication year and reviews of a book."""
+
+    # When the user is redirected or they follow a link
+    if request.method == "GET":
+        # Retrieve book object from db
+        try:
+            book_data = books.objects.get(book_id=book_id)
+        except:
+            try:
+                book_data = books.objects.get(id=book_id)
+            # Return error message and redirect user
+            except:
+                messages.add_message(request, messages.ERROR, "Book was not found.")
+                return HttpResponseRedirect(reverse("search"))
+        title = book_data.title
+        author = book_data.author
+        isbn = book_data.isbn
+        # Retrieve all reviews of book
+        review_data = reviews.objects.filter(book_id=book_id)
+        # Request book information from Goodreads API
+        response = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": settings.API_KEY, "isbns": isbn})
+        goodreads = response.json()
+        work_ratings_count = goodreads["books"][0]["work_ratings_count"]
+        average_rating = goodreads["books"][0]["average_rating"]
+        context = {
+            "title": title,
+            "author": author,
+            "isbn": isbn,
+            "review_data": review_data,
+            "work_ratings_count": work_ratings_count,
+            "average_rating": average_rating
+        }
+        return render(request, "review/bookpage.html", context)
+    # When the user submits a form (POST)
+    else:
+        return True
 
 def register(request):
-    """Display user registration form and register a new user."""
+    """Displays user registration form and registers a new user."""
 
     # When the user is redirected or they follow a link
     if request.method == "GET":
@@ -157,7 +192,7 @@ def register(request):
 
 
 def login_view(request):
-    """Display the login page and log user in."""
+    """Displays the login page and logs users in."""
 
     # When the user is redirected or they follow a link
     if request.method == "GET":
@@ -187,7 +222,7 @@ def login_view(request):
 
 
 def logout_view(request):
-    """Log user out."""
+    """Logs users out."""
 
     logout(request)
     messages.add_message(request, messages.SUCCESS, "Logged out succesfully.")
