@@ -23,39 +23,39 @@
                     <ul class="navbar-nav ml-auto">
                         {% with request.resolver_match.view_name as view_name %}
                             {% if user.is_authenticated %}
-                                <li class="nav-item mr-5">
-                                    <p class="welcome">Welcome, {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} <img src="{% static 'review/images/icons/user.svg' %}" id="user-img"> !</p>
-                                </li>
-                                {% if view_name == 'index' %}
-                                    <li class="nav-item active">
-                                        <a class="nav-link active" href="#"><img src="{% static 'review/images/icons/search.svg' %}" class="icon-active">Search Book <span class="sr-only">(current)</span></a>
-                                    </li>
-                                {% else %}
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{% url 'index' %}"><img src="{% static 'review/images/icons/search.svg" class="icon">Search Book</a>
-                                    </li>
-                                {% endif %}
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'logout' %}"><img src="{% static 'review/images/icons/logout.svg' %}" class="icon">Log Out</a>
-                                </li>
+                            <li class="nav-item mr-5">
+                                <p class="welcome">Welcome, {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} <img src="{% static 'review/images/icons/user.svg' %}" id="user-img"> !</p>
+                            </li>
+                            {% if view_name == 'index' %}
+                            <li class="nav-item active">
+                                <a class="nav-link active" href="#"><img src="{% static 'review/images/icons/search.svg' %}" class="icon-active">Search Book <span class="sr-only">(current)</span></a>
+                            </li>
+                            {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'index' %}"><img src="{% static 'review/images/icons/search.svg' %}" class="icon">Search Book</a>
+                            </li>
+                            {% endif %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'logout' %}"><img src="{% static 'review/images/icons/logout.svg' %}" class="icon">Log Out</a>
+                            </li>
                             {% else %}
                                 {% if view_name == 'register' %}
-                                    <li class="nav-item active">
-                                        <a class="nav-link active" href="#"><img src="{% static 'review/images/icons/register.svg' %}" class="icon-active">Register <span class="sr-only">(current)</span></a>
-                                    </li>
+                                <li class="nav-item active">
+                                    <a class="nav-link active" href="#"><img src="{% static 'review/images/icons/register.svg' %}" class="icon-active">Register <span class="sr-only">(current)</span></a>
+                                </li>
                                 {% else %}
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{% url 'register' %}"><img src="{% static 'review/images/icons/register.svg' %}" class="icon">Register</a>
-                                    </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'register' %}"><img src="{% static 'review/images/icons/register.svg' %}" class="icon">Register</a>
+                                </li>
                                 {% endif %}
                                 {% if view_name == 'login' %}
-                                    <li class="nav-item active">
-                                        <a class="nav-link active" href="#"><img src="{% static 'review/images/icons/login.svg' %}" class="icon-active">Log In <span class="sr-only">(current)</span></a>
-                                    </li>
+                                <li class="nav-item active">
+                                    <a class="nav-link active" href="#"><img src="{% static 'review/images/icons/login.svg' %}" class="icon-active">Log In <span class="sr-only">(current)</span></a>
+                                </li>
                                 {% else %}
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{% url 'login' %}"><img src="{% static 'review/images/icons/login.svg' %}" class="icon">Log In</a>
-                                    </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'login' %}"><img src="{% static 'review/images/icons/login.svg' %}" class="icon">Log In</a>
+                                </li>
                                 {% endif %}
                             {% endif %}
                         {% endwith %}
@@ -65,10 +65,14 @@
         </header>
         <main>
             <div class="container">
-                {% if message %}
-                    <div class="alert alert-dark" role="alert">
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.DEBUG %}dark{% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO  %}info{% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}success{% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}warning{% else %}danger{% endif %}" role="alert">
                         {{ message }}
                     </div>
+                    {% endfor %}
+                </div>
                 {% endif %}
                 {% block main %}{% endblock %}
             </div>
