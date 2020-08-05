@@ -1,4 +1,5 @@
 import requests
+import csv
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
@@ -12,6 +13,24 @@ from django.core.exceptions import FieldError, FieldDoesNotExist, ObjectDoesNotE
 from django.conf import settings
 
 # Create your views here.
+def import_books(request):
+    """Import 5000 books from a csv file"""
+    # Open books file
+    f = open("books.csv")
+    # Read the csv file
+    reader = csv.reader(f)
+    # Skip the headers row
+    next(reader, None)
+    obj_list = []
+    # Iterate over every row in the csv file
+    for isbn, title, author, year in reader:
+        b = books(isbn=isbn, title=title, author=author, year=year)
+        obj_list.append(b)
+    books.objects.bulk_create(obj_list)
+    messages.add_message(request, messages.SUCCESS, f"Books succesfully imported!")
+    return HttpResponseRedirect(reverse("search"))
+
+
 def index(request):
     """Displays splash page"""
 
@@ -88,14 +107,11 @@ def book_page(request, book_id):
     if request.method == "GET":
         # Retrieve book object from db
         try:
-            book_data = books.objects.get(book_id=book_id)
+            book_data = books.objects.get(id=book_id)
+        # Return error message and redirect user
         except:
-            try:
-                book_data = books.objects.get(id=book_id)
-            # Return error message and redirect user
-            except:
-                messages.add_message(request, messages.ERROR, "Book was not found.")
-                return HttpResponseRedirect(reverse("search"))
+            messages.add_message(request, messages.ERROR, "Book was not found.")
+            return HttpResponseRedirect(reverse("search"))
         title = book_data.title
         author = book_data.author
         isbn = book_data.isbn
@@ -134,14 +150,11 @@ def book_page(request, book_id):
             return HttpResponseRedirect(reverse("book", args=(book_id,)))
         # Retrieve book object from db
         try:
-            book_data = books.objects.get(book_id=book_id)
+            book_data = books.objects.get(id=book_id)
+        # Return error message and redirect user
         except:
-            try:
-                book_data = books.objects.get(id=book_id)
-            # Return error message and redirect user
-            except:
-                messages.add_message(request, messages.ERROR, "Book was not found.")
-                return HttpResponseRedirect(reverse("search"))
+            messages.add_message(request, messages.ERROR, "Book was not found.")
+            return HttpResponseRedirect(reverse("search"))
         # Insert review into database
         r = reviews(book_id=book_data, user_id=request.user, rating=rating, reviewtext=reviewtext)
         r.save()
