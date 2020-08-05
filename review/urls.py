@@ -10,5 +10,6 @@ urlpatterns = [
   path("search", views.search, name="search"),
   path("search/", views.empty_search, name="empty_search"),
   path("search/<str:searchquery>", views.search_results, name="results"),
-  path("book/<int:book_id>", views.book_page, name="book")
+  path("book/<int:book_id>", views.book_page, name="book"),
+  path("api/<str:isbn>", views.api_view, name="api")
 ]

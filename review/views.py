@@ -1,7 +1,7 @@
 import requests
 
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -10,6 +10,7 @@ from .models import books, reviews
 from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import FieldError, FieldDoesNotExist, ObjectDoesNotExist
 from django.conf import settings
+from django.db.models import Avg
 
 # Create your views here.
 def index(request):
@@ -154,6 +155,7 @@ def book_page(request, book_id):
         messages.add_message(request, messages.SUCCESS, "Review submitted succesfully!")
         return HttpResponseRedirect(reverse("book", args=(book_id,)))
 
+
 def register(request):
     """Displays user registration form and registers a new user."""
 
@@ -264,3 +266,31 @@ def logout_view(request):
     logout(request)
     messages.add_message(request, messages.SUCCESS, "Logged out succesfully.")
     return HttpResponseRedirect(reverse("login"))
+
+
+def api_view(request, isbn):
+    """Return information about a book in the database."""
+
+    # Check book in database with ISBN number provided
+    try:
+        book_data = books.objects.get(isbn=isbn)
+    except:
+        return JsonResponse({"error": "Book not found"}, status=404)
+
+    year = int(book_data.year)
+    review_data = reviews.objects.filter(book_id=book_data)
+    review_count = review_data.count()
+    averaged = review_data.aggregate(Avg("rating"))
+    average_score = averaged["rating__avg"]
+    # book_data = db.execute("SELECT title, author, year, COUNT(rating), ROUND(AVG(rating)::numeric,1) FROM books JOIN reviews ON reviews.book_id = books.book_id WHERE isbn = :isbn GROUP BY title, author, year",
+    #{"isbn": isbn}).fetchone()
+    # If the book is not in the database
+    # Return response with book data
+    return JsonResponse({
+            "title": book_data.title,
+            "author": book_data.author,
+            "year": year,
+            "isbn": isbn,
+            "review_count": review_count,
+            "average_score": average_score
+        })
