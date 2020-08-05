@@ -1,5 +1,4 @@
 import requests
-import csv
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
@@ -13,24 +12,6 @@ from django.core.exceptions import FieldError, FieldDoesNotExist, ObjectDoesNotE
 from django.conf import settings
 
 # Create your views here.
-def import_books(request):
-    """Import 5000 books from a csv file"""
-    # Open books file
-    f = open("books.csv")
-    # Read the csv file
-    reader = csv.reader(f)
-    # Skip the headers row
-    next(reader, None)
-    obj_list = []
-    # Iterate over every row in the csv file
-    for isbn, title, author, year in reader:
-        b = books(isbn=isbn, title=title, author=author, year=year)
-        obj_list.append(b)
-    books.objects.bulk_create(obj_list)
-    messages.add_message(request, messages.SUCCESS, f"Books succesfully imported!")
-    return HttpResponseRedirect(reverse("search"))
-
-
 def index(request):
     """Displays splash page"""
 
@@ -115,8 +96,18 @@ def book_page(request, book_id):
         title = book_data.title
         author = book_data.author
         isbn = book_data.isbn
+        year = book_data.year
         # Retrieve all reviews of book
         review_data = reviews.objects.filter(book_id=book_id)
+        # Get ranges from reviews
+        rev_data = []
+        max = 5
+        for review in review_data:
+            username = review.user_id.username
+            rating = range(review.rating)
+            remainder = range(max - review.rating)
+            reviewtext = review.reviewtext
+            rev_data.append({"rating": rating, "remainder": remainder, "username": username, "reviewtext": reviewtext})
         # Request book information from Goodreads API
         response = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": settings.API_KEY, "isbns": isbn})
         goodreads = response.json()
@@ -126,7 +117,8 @@ def book_page(request, book_id):
             "title": title,
             "author": author,
             "isbn": isbn,
-            "review_data": review_data,
+            "year": year,
+            "rev_data": rev_data,
             "work_ratings_count": work_ratings_count,
             "average_rating": average_rating,
             "book_id": book_id

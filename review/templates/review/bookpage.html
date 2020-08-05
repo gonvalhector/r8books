@@ -43,16 +43,17 @@
             <div class="col">
                 <h1 class="bgd2">User Reviews:</h1>
                 <div class="reviews my-3">
-                    {% for review in review_data %}
+                    {% for review in rev_data %}
                         <div class="review my-2">
-                            <h5 class="welcome"><img src="{% static 'review/images/icons/user.svg' %}" id="user-img" class="mx-1">{{ review.user_id.username }}</h5>
+                            <h5 class="welcome"><img src="{% static 'review/images/icons/user.svg' %}" id="user-img" class="mx-1">{{ review.username }}</h5>
                             <p class="txt3">
-                                <b>Rating: </b>
-                                {% with ""|center:review.rating as range %}
-                                {% for _ in range %}
+                                <b class="align-middle">Rating: </b>
+                                {% for i in review.rating %}
                                     <img src="{% static 'review/images/icons/star.svg' %}" class="mx-1">
                                 {% endfor %}
-                                {% endwith %}
+                                {% for i in review.remainder %}
+                                    <img src="{% static 'review/images/icons/star_empty.svg' %}" class="mx-1">
+                                {% endfor %}
                             </p>
                             <p><i>"{{ review.reviewtext }}"</i></p>
                             <hr>
