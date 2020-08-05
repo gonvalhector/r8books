@@ -9,7 +9,7 @@
     <div class="container">
         <div class="row">
             <div class="col-4">
-                <img src="{% static 'review/images/icons/info.svg' %}" alt="Book Info" id="info">
+                <img src="{% static 'review/images/icons/info.svg' %}" alt="Book Info" id="info" class="my-3">
             </div>
             <div class="col-8">
                 <h5>Title:</h5>
@@ -24,7 +24,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <h1 class="bgd2"><a href="https://www.goodreads.com/">Goodreads</a> Review data:</h1>
+                <h1 class="bgd2"><a href="https://www.goodreads.com/">Goodreads</a> Review Data:</h1>
                 <h5>Average Rating:</h5>
                 {% if average_rating %}
                     <p class="txt3">{{ average_rating }}</p>
@@ -42,23 +42,34 @@
         <div class="row">
             <div class="col">
                 <h1 class="bgd2">User Reviews:</h1>
-                {% for review in review_data %}
-                    <h5 class="welcome"><img src="{% static 'review/images/icons/user.svg' %}" id="user-img"> {{ review.username }}</h5>
-                    <p class="txt3"><b>Rating:</b> {{ review.rating }}</p>
-                    <p><i>"{{ review.reviewtext }}"</i></p>
-                    <hr>
-                {% empty %}
-                    <p>No reviews have been submitted for this book.</p>
-                {% endfor %}
+                <div class="reviews my-3">
+                    {% for review in review_data %}
+                        <div class="review my-2">
+                            <h5 class="welcome"><img src="{% static 'review/images/icons/user.svg' %}" id="user-img" class="mx-1">{{ review.user_id.username }}</h5>
+                            <p class="txt3">
+                                <b>Rating: </b>
+                                {% with ""|center:review.rating as range %}
+                                {% for _ in range %}
+                                    <img src="{% static 'review/images/icons/star.svg' %}" class="mx-1">
+                                {% endfor %}
+                                {% endwith %}
+                            </p>
+                            <p><i>"{{ review.reviewtext }}"</i></p>
+                            <hr>
+                        </div>
+                    {% empty %}
+                        <p>No reviews have been submitted for this book.</p>
+                    {% endfor %}
+                </div>
             </div>
         </div>
         <div class="row">
             <div class="col">
                 <h1 class="bgd2">Submit Review:</h1>
-                <form action="" method="">
+                <form action="{% url 'book' book_id %}" method="post">
                     {% csrf_token %}
                     <div class="form-group">
-                        <label for="exampleFormControlSelect1">Rating</label>
+                        <label for="rating">Rating</label>
                         <select class="form-control" id="rating" name="rating">
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -69,7 +80,7 @@
                     </div>
                     <div class="form-group">
                         <label for="reviewtext">Review</label>
-                        <textarea class="form-control" id="review" rows="3" name="reviewtext"></textarea>
+                        <textarea class="form-control" id="reviewtext" rows="3" name="reviewtext"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit Review</button>
                 </form>

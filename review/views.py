@@ -79,6 +79,8 @@ def search_results(request, searchquery):
     }
     return render(request, "review/results.html", context)
 
+
+@csrf_protect
 def book_page(request, book_id):
     """Displays a page with title, author, ISBN, publication year and reviews of a book."""
 
@@ -110,12 +112,42 @@ def book_page(request, book_id):
             "isbn": isbn,
             "review_data": review_data,
             "work_ratings_count": work_ratings_count,
-            "average_rating": average_rating
+            "average_rating": average_rating,
+            "book_id": book_id
         }
         return render(request, "review/bookpage.html", context)
     # When the user submits a form (POST)
     else:
-        return True
+        # Check if the user has previously submitted a review
+        review_check = reviews.objects.filter(book_id=book_id, user_id=request.user.id)
+        # If the user has a previously submitted review
+        if review_check:
+            messages.add_message(request, messages.ERROR, "You cannot submit a review for this book again.")
+            return HttpResponseRedirect(reverse("book", args=(book_id,)))
+        # Request submitted review data
+        rating = request.POST["rating"]
+        reviewtext = request.POST["reviewtext"]
+        # If there is no input in the reviewtext field
+        if not reviewtext:
+            # Return error
+            messages.add_message(request, messages.ERROR, "Please, provide a review in the text field in order to submit a review.")
+            return HttpResponseRedirect(reverse("book", args=(book_id,)))
+        # Retrieve book object from db
+        try:
+            book_data = books.objects.get(book_id=book_id)
+        except:
+            try:
+                book_data = books.objects.get(id=book_id)
+            # Return error message and redirect user
+            except:
+                messages.add_message(request, messages.ERROR, "Book was not found.")
+                return HttpResponseRedirect(reverse("search"))
+        # Insert review into database
+        r = reviews(book_id=book_data, user_id=request.user, rating=rating, reviewtext=reviewtext)
+        r.save()
+        # Redirect to book page with success message
+        messages.add_message(request, messages.SUCCESS, "Review submitted succesfully!")
+        return HttpResponseRedirect(reverse("book", args=(book_id,)))
 
 def register(request):
     """Displays user registration form and registers a new user."""

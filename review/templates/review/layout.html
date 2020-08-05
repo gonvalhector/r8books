@@ -24,7 +24,7 @@
                         {% with request.resolver_match.view_name as view_name %}
                             {% if user.is_authenticated %}
                             <li class="nav-item mr-5">
-                                <p class="welcome my-2">Welcome, {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} <img src="{% static 'review/images/icons/user.svg' %}" id="user-img"> !</p>
+                                <p class="welcome my-2"><i>Welcome</i>, {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}<img src="{% static 'review/images/icons/user.svg' %}" id="user-img" class="mx-1">!</p>
                             </li>
                             {% if view_name == 'search' %}
                             <li class="nav-item active">
