@@ -6,9 +6,57 @@
 {% endblock %}
 
 {% block main %}
-    <div class="row">
+    <div class="row my-3">
         <div class="col">
-            <h1>TODO</h1>
+            <h1>Rate and review books with R8Books</h1>
+            <p class="mt-3"><b>Register</b> for a free account and <b>search</b>
+                from a list of 5000 titles either by their <i>Title</i>, <i>Author</i> or <i>ISBN</i>.
+                Then rate from a scale of 1 to 5 stars and write your review!</p>
+            {% if not user.is_authenticated %}
+                <a class="btn btn-primary mr-2" href="{% url 'register' %}" role="button">Register</a>
+                <a class="btn btn-primary" href="{% url 'login' %}" role="button">Log In</a>
+            {% else %}
+                <a class="btn btn-primary" href="{% url 'search' %}" role="button">Search</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row my-3">
+        <div class="col">
+            <h2>About</h2>
+            <p class="mt-3">
+                <b>R8Books</b> is a web application written in <a href="https://www.python.org/">Python 3.6.9</a>
+                that uses the <a href="https://www.djangoproject.com/">Django 3.0.8</a>
+                web framework and is currently being hosted on the <a href="https://www.heroku.com/home">Heroku</a> platform.
+                You can find the <a href="https://github.com/">GitHub</a> repository <a href="https://github.com/gonvalhector/r8books">here</a>.
+            </p>
+            <p>
+                Originally designed with the <a href="https://flask.palletsprojects.com/en/1.1.x/">Flask</a>
+                framework for the <a href="https://cs50.harvard.edu/web/2018/">CS50’s Web Programming with Python and JavaScript</a> course.
+            </p>
+        </div>
+    </div>
+    <div class="row my-3">
+        <div class="col">
+            <h2>API</h2>
+            <p class="mt-3">
+                Authenticated users can make a GET request to the /api/<isbn> route,
+                where <isbn> is an ISBN number.
+                R8Books will return a JSON response containing the book’s title,
+                author, publication date, ISBN number, review count, and average score.
+            </p>
+        </div>
+    </div>
+    <div class="row my-3">
+        <div class="col">
+            <h2>Credits</h2>
+            <ul class="list-group mt-3">
+                <li class="list-group-item"><b>CSS Library:</b> <a href="https://getbootstrap.com/">Bootstrap 4</a></li>
+                <li class="list-group-item"><b>Color Scheme:</b> <a href="https://coolors.co/">Coolors</a></li>
+                <li class="list-group-item"><b>Icons:</b> <a href="https://iconmonstr.com/">Iconmonstr</a></li>
+                <li class="list-group-item"><b>Filter Generation:</b> <a href="https://codepen.io/sosuke/pen/Pjoqqp">CSS Filter Generator</a></li>
+                <li class="list-group-item"><b>Fonts:</b> <a href="https://fonts.google.com/specimen/Recursive">Recursive</a></li>
+                <li class="list-group-item"><b>Fonts:</b> <a href="https://fonts.google.com/specimen/Antic+Slab">Antic Slab</a></li>
+            </ul>
         </div>
     </div>
 {% endblock %}

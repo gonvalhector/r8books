@@ -1,4 +1,5 @@
 import requests
+import csv
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -14,13 +15,15 @@ from django.db.models import Avg
 
 # Create your views here.
 def index(request):
-    """Displays splash page"""
+    """Displays splash page."""
 
-    return render(request, "review/index.html")
+    # When the user is redirected or they follow a link
+    if request.method == "GET":
+        return render(request, "review/index.html")
 
 
 def search(request):
-    """Searches for a book by title, author or ISBN number."""
+    """Searches for a book by title, author or ISBN."""
 
     # When the user is logged out
     if not request.user.is_authenticated:
@@ -36,49 +39,53 @@ def search(request):
         # If there is no search query
         if not searchquery:
             # Return error message
-            messages.add_message(request, messages.ERROR, "Please, input a title, author or the ISBN number of a book.")
+            messages.add_message(request, messages.ERROR, "Please, input a title, author or ISBN of a book.")
             return HttpResponseRedirect(reverse("search"))
         return HttpResponseRedirect(reverse("results", args=(searchquery,)))
 
 
 def empty_search(request):
-    """Redirects to search page when the user forgets the query."""
+    """Redirects to search view when the user forgets the query."""
 
-    # When the user is logged out
-    if not request.user.is_authenticated:
-        messages.add_message(request, messages.WARNING, "You must be logged in.")
-        return HttpResponseRedirect(reverse("login"))
-    # Return error message and redirect user
-    messages.add_message(request, messages.ERROR, "Please, input a title, author or the ISBN number of a book.")
-    return HttpResponseRedirect(reverse("search"))
+    # When the user is redirected or they follow a link
+    if request.method == "GET":
+        # When the user is logged out
+        if not request.user.is_authenticated:
+            messages.add_message(request, messages.WARNING, "You must be logged in.")
+            return HttpResponseRedirect(reverse("login"))
+        # Return error message and redirect user
+        messages.add_message(request, messages.ERROR, "Please, input a title, author or ISBN of a book.")
+        return HttpResponseRedirect(reverse("search"))
 
 
 @csrf_protect
 def search_results(request, searchquery):
     """Displays results of a search query."""
 
-    # If there is no search query
-    if not searchquery:
-        # Return error message
-        messages.add_message(request, messages.ERROR, "Please, input a title, author or the ISBN number of a book.")
-        return HttpResponseRedirect(reverse("search"))
-    # When the user is logged out
-    if not request.user.is_authenticated:
-        messages.add_message(request, messages.WARNING, "You must be logged in.")
-        return HttpResponseRedirect(reverse("login"))
-    # Query the database for books by title
-    resultsbytitle = books.objects.filter(title__icontains=searchquery)
-    # Query the database for books by author
-    resultsbyauthor = books.objects.filter(author__icontains=searchquery)
-    # Query the database for books by ISBN
-    resultsbyisbn = books.objects.filter(isbn__icontains=searchquery)
-    context = {
-        "searchquery": searchquery,
-        "resultsbytitle": resultsbytitle,
-        "resultsbyauthor": resultsbyauthor,
-        "resultsbyisbn": resultsbyisbn,
-    }
-    return render(request, "review/results.html", context)
+    # When the user is redirected or they follow a link
+    if request.method == "GET":
+        # If there is no search query
+        if not searchquery:
+            # Return error message
+            messages.add_message(request, messages.ERROR, "Please, input a title, author or ISBN of a book.")
+            return HttpResponseRedirect(reverse("search"))
+        # When the user is logged out
+        if not request.user.is_authenticated:
+            messages.add_message(request, messages.WARNING, "You must be logged in.")
+            return HttpResponseRedirect(reverse("login"))
+        # Query the database for books by title
+        resultsbytitle = books.objects.filter(title__icontains=searchquery)
+        # Query the database for books by author
+        resultsbyauthor = books.objects.filter(author__icontains=searchquery)
+        # Query the database for books by ISBN
+        resultsbyisbn = books.objects.filter(isbn__icontains=searchquery)
+        context = {
+            "searchquery": searchquery,
+            "resultsbytitle": resultsbytitle,
+            "resultsbyauthor": resultsbyauthor,
+            "resultsbyisbn": resultsbyisbn,
+        }
+        return render(request, "review/results.html", context)
 
 
 @csrf_protect
@@ -105,10 +112,15 @@ def book_page(request, book_id):
         max = 5
         for review in review_data:
             username = review.user_id.username
+            u = User.objects.get(username=username)
+            if u.first_name and u.last_name:
+                name = u.first_name + " " + u.last_name
+            else:
+                name = None
             rating = range(review.rating)
             remainder = range(max - review.rating)
             reviewtext = review.reviewtext
-            rev_data.append({"rating": rating, "remainder": remainder, "username": username, "reviewtext": reviewtext})
+            rev_data.append({"rating": rating, "remainder": remainder, "username": username, "name": name, "reviewtext": reviewtext})
         # Request book information from Goodreads API
         response = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": settings.API_KEY, "isbns": isbn})
         goodreads = response.json()
@@ -263,34 +275,73 @@ def login_view(request):
 def logout_view(request):
     """Logs users out."""
 
-    logout(request)
-    messages.add_message(request, messages.SUCCESS, "Logged out succesfully.")
-    return HttpResponseRedirect(reverse("login"))
+    # When the user is redirected or they follow a link
+    if request.method == "GET":
+        logout(request)
+        messages.add_message(request, messages.SUCCESS, "Logged out succesfully.")
+        return HttpResponseRedirect(reverse("login"))
 
 
 def api_view(request, isbn):
-    """Return information about a book in the database."""
+    """Returns information about a book from the database."""
 
-    # Check book in database with ISBN number provided
-    try:
-        book_data = books.objects.get(isbn=isbn)
-    except:
-        return JsonResponse({"error": "Book not found"}, status=404)
+    # When the user is redirected or they follow a link
+    if request.method == "GET":
+        # If the user is not authenticated
+        if not request.user.is_authenticated:
+            messages.add_message(request, messages.ERROR, "You must be an authenticated user to use R8Books's API.")
+            return HttpResponseRedirect(reverse("login"))
+        # Check book in database with ISBN number provided
+        try:
+            book_data = books.objects.get(isbn=isbn)
+        except:
+            # Return error response
+            return JsonResponse({"error": "Book not found"}, status=404)
+        # Define variables with data for response
+        year = int(book_data.year)
+        review_data = reviews.objects.filter(book_id=book_data)
+        review_count = review_data.count()
+        averaged = review_data.aggregate(Avg("rating"))
+        average_score = averaged["rating__avg"]
+        # Return response with book data
+        return JsonResponse({
+                "title": book_data.title,
+                "author": book_data.author,
+                "year": year,
+                "isbn": isbn,
+                "review_count": review_count,
+                "average_score": average_score
+            })
 
-    year = int(book_data.year)
-    review_data = reviews.objects.filter(book_id=book_data)
-    review_count = review_data.count()
-    averaged = review_data.aggregate(Avg("rating"))
-    average_score = averaged["rating__avg"]
-    # book_data = db.execute("SELECT title, author, year, COUNT(rating), ROUND(AVG(rating)::numeric,1) FROM books JOIN reviews ON reviews.book_id = books.book_id WHERE isbn = :isbn GROUP BY title, author, year",
-    #{"isbn": isbn}).fetchone()
-    # If the book is not in the database
-    # Return response with book data
-    return JsonResponse({
-            "title": book_data.title,
-            "author": book_data.author,
-            "year": year,
-            "isbn": isbn,
-            "review_count": review_count,
-            "average_score": average_score
-        })
+
+def import_view(request):
+    """Imports data about 5000 books from a CSV file."""
+
+    # When the user is redirected or they follow a link
+    if request.method == "GET":
+        # If the user belongs to the staff or is the admin
+        if request.user.is_staff == True:
+            # Open books file
+            f = open("books.csv")
+            # Read the csv file
+            reader = csv.reader(f)
+            # Skip the headers row
+            next(reader, None)
+            # Declare list of objects
+            obj_list = []
+            # Iterate over every row in the csv file
+            for isbn, title, author, year in reader:
+                # Create book object
+                b = books(isbn=isbn, title=title, author=author, year=year)
+                # Append book object to list
+                obj_list.append(b)
+            # Create db insertion of book objects in bulk
+            books.objects.bulk_create(obj_list)
+            # Redirect authorized user with success message
+            messages.add_message(request, messages.SUCCESS, "Books imported succesfully!")
+            return HttpResponseRedirect(reverse("index"))
+        # If the user is unauthorized
+        else:
+            # Redirect unauthorized user with error message
+            messages.add_message(request, messages.ERROR, "You don't have the required permissions.")
+            return HttpResponseRedirect(reverse("index"))

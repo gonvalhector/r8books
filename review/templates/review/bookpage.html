@@ -45,14 +45,13 @@
                 <div class="reviews my-3">
                     {% for review in rev_data %}
                         <div class="review my-2">
-                            <h5 class="welcome"><img src="{% static 'review/images/icons/user.svg' %}" id="user-img" class="mx-1">{{ review.username }}</h5>
-                            <p class="txt3">
-                                <b class="align-middle">Rating: </b>
+                            <h5 class="welcome"><img src="{% static 'review/images/icons/user.svg' %}" id="user-img" class="mx-1">{% if review.name %}{{ review.name }}{% else %}{{ review.username }}{% endif %}</h5>
+                            <p class="stars" title="Rating">
                                 {% for i in review.rating %}
-                                    <img src="{% static 'review/images/icons/star.svg' %}" class="mx-1">
+                                <img src="{% static 'review/images/icons/star.svg' %}" class="mx-1" alt="Star Icon">
                                 {% endfor %}
                                 {% for i in review.remainder %}
-                                    <img src="{% static 'review/images/icons/star_empty.svg' %}" class="mx-1">
+                                <img src="{% static 'review/images/icons/star_empty.svg' %}" class="mx-1" alt="Star Outline Icon">
                                 {% endfor %}
                             </p>
                             <p><i>"{{ review.reviewtext }}"</i></p>

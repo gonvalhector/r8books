@@ -1,0 +1,199 @@
+$txt1: #FFFFFF;
+$txt2: #BFC0C0;
+$txt3: #EF8354;
+$bgd1: #2D3142;
+$bgd2: #4F5D75;
+$fltrtxt1: invert(99%) sepia(1%) saturate(924%) hue-rotate(210deg) brightness(115%) contrast(100%);
+$fltrtxt2: invert(67%) sepia(71%) saturate(0%) hue-rotate(230deg) brightness(98%) contrast(98%);
+$fltrtxt3: invert(78%) sepia(29%) saturate(5568%) hue-rotate(322deg) brightness(97%) contrast(94%);
+
+
+body {
+    background-color: $bgd1;
+    color: $txt1;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    h1, h2 {
+        font-family: antic_slab;
+    }
+    h1 {
+        color: $txt2;
+    }
+    h2 {
+        color: $txt2;
+    }
+    p {
+        color: $txt1;
+    }
+    .btn-primary {
+        border-color: $bgd2;
+        background-color: $bgd2;
+    }
+    .btn-primary:disabled {
+        border-color: $bgd2;
+        background-color: $bgd2;
+    }
+    .btn-primary:hover {
+        border-color: $txt2;
+        background-color: $txt2;
+    }
+    .btn-primary:focus, .btn-primary:active, .btn-primary.active, .btn-primary.focus {
+        outline: none;
+        box-shadow: none;
+        border-color: $txt3;
+        background-color: $txt3;
+    }
+    .list-group {
+        .list-group-item {
+            color: $txt2;
+            background-color: $bgd1;
+            border: None;
+            a {
+                color: $txt3;
+            }
+            a:hover {
+                color: $txt1;
+            }
+            .badge-primary {
+                background-color: $bgd2;
+            }
+        }
+    }
+    .txt3 {
+        color: $txt3;
+    }
+    .bgd2 {
+        color: $bgd2
+    }
+    .welcome {
+        color: $txt2;
+        #user-img {
+            filter: $fltrtxt2;
+        }
+    }
+
+    a {
+        color: $bgd2;
+    }
+    a:hover {
+        color: $txt2;
+    }
+    #info {
+        filter: invert(34%) sepia(9%) saturate(1211%) hue-rotate(179deg) brightness(100%) contrast(92%);
+    }
+    header {
+        nav {
+            font-family: antic_slab;
+            .navbar-brand {
+                font-family: recursive;
+                color: $txt3;
+                #brand-img {
+                    width: 5vh;
+                    height: auto;
+                    filter: $fltrtxt3;
+                }
+            }
+            .navbar-toggler-icon {
+              background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(239,131,84, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+            }
+            .nav-link {
+                color: $txt2;
+                .icon {
+                    filter: $fltrtxt2;
+                }
+            }
+            .nav-link:hover {
+                color: $txt1;
+                .icon {
+                    filter: $fltrtxt1;
+                }
+            }
+            .active {
+                color: $txt3;
+                .icon-active {
+                    filter: $fltrtxt3;
+                }
+            }
+            .active:hover {
+                color: $txt3;
+            }
+        }
+    }
+    main {
+        margin-top: 1%;
+        margin-bottom: 5%;
+        #search {
+            margin-top: 20%;
+        }
+        .stars {
+            filter: $fltrtxt3
+        }
+        #rating {
+            width: 75px;
+        }
+    }
+    footer {
+        width: 100%;
+        position: fixed;
+        bottom: 10px;
+        z-index: 20;
+        .footer-bttn {
+            filter: $fltrtxt2;
+        }
+        .footer-bttn:hover {
+            filter: $fltrtxt1;
+        }
+    }
+
+}
+
+@media (min-width:0px) {
+    #info {
+        position: absolute;
+        left: 10vw;
+        bottom: 20vh;
+        width: 15vw;
+        height: auto;
+    }
+}
+
+@media (min-width:530px) {
+    #info {
+        position: absolute;
+        left: 10vw;
+        bottom: 15vh;
+        width: 15vw;
+        height: auto;
+    }
+}
+
+@media (min-width:768px) {
+    #info {
+        position: absolute;
+        left: 7.5vw;
+        bottom: 7.5vh;
+        width: 15vw;
+        height: auto;
+    }
+}
+
+@media (min-width:1600px) {
+    #info {
+        position: absolute;
+        left: 2.5vw;
+        bottom: 2.5vh;
+        width: 15vw;
+        height: auto;
+    }
+}
+
+@font-face {
+    font-family: "recursive";
+    src: local("recursive"), url("../fonts/Recursive/Recursive-VariableFont_CASL,CRSV,MONO,slnt,wght.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "antic_slab";
+    src: local("antic_slab"), url("../fonts/Antic_Slab/AnticSlab-Regular.ttf") format("truetype");
+}
