@@ -24,23 +24,6 @@
         </div>
         <div class="row">
             <div class="col">
-                <h1 class="bgd2"><a href="https://www.goodreads.com/">Goodreads</a> Review Data:</h1>
-                <h5>Average Rating:</h5>
-                {% if average_rating %}
-                    <p class="txt3">{{ average_rating }}</p>
-                {% else %}
-                    <p class="txt3">Book data not found in <a href="https://www.goodreads.com/">Goodreads</a>.</p>
-                {% endif %}
-                <h5>Number of Ratings:</h5>
-                {% if work_ratings_count %}
-                    <p class="txt3">{{ work_ratings_count }}</p>
-                {% else %}
-                    <p class="txt3">Book data not found in <a href="https://www.goodreads.com/">Goodreads</a>.</p>
-                {% endif %}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
                 <h1 class="bgd2">User Reviews:</h1>
                 <div class="reviews my-3">
                     {% for review in rev_data %}

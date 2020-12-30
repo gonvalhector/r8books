@@ -1,4 +1,3 @@
-import requests
 import csv
 
 from django.shortcuts import render, redirect
@@ -121,19 +120,12 @@ def book_page(request, book_id):
             remainder = range(max - review.rating)
             reviewtext = review.reviewtext
             rev_data.append({"rating": rating, "remainder": remainder, "username": username, "name": name, "reviewtext": reviewtext})
-        # Request book information from Goodreads API
-        response = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": settings.API_KEY, "isbns": isbn})
-        goodreads = response.json()
-        work_ratings_count = goodreads["books"][0]["work_ratings_count"]
-        average_rating = goodreads["books"][0]["average_rating"]
         context = {
             "title": title,
             "author": author,
             "isbn": isbn,
             "year": year,
             "rev_data": rev_data,
-            "work_ratings_count": work_ratings_count,
-            "average_rating": average_rating,
             "book_id": book_id
         }
         return render(request, "review/bookpage.html", context)
