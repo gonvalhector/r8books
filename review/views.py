@@ -9,7 +9,6 @@ from django.contrib import messages
 from .models import books, reviews
 from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import FieldError, FieldDoesNotExist, ObjectDoesNotExist
-from django.conf import settings
 from django.db.models import Avg
 
 # Create your views here.
