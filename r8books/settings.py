@@ -40,7 +40,7 @@ else:
     SECRET_KEY = os.environ["R8BOOKS_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
